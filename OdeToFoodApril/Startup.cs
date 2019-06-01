@@ -55,12 +55,30 @@ namespace OdeToFoodApril
                 app.UseHsts();
             }
 
+            app.Use(SayHelloMiddleware);
+
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseNodeModules(env);
             app.UseCookiePolicy();
 
             app.UseMvc();
+        }
+
+        private RequestDelegate SayHelloMiddleware(RequestDelegate next)
+        {
+            RequestDelegate requestDelegate = (async x =>
+            {
+                if (x.Request.Path.StartsWithSegments("/hello"))
+                {
+                    await x.Response.WriteAsync("Hello World!!");
+                }
+                else
+                {
+                    await next(x);
+                }
+            });
+            return requestDelegate;
         }
     }
 }
